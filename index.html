@@ -10,18 +10,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg:#0A100C;
-    --panel:#101B14;
-    --panel-alt:#15231A;
-    --line:#22342A;
-    --neon:#8CFF3D;
-    --neon-dim:#6BDB2A;
-    --deep:#1F6B3A;
-    --text:#EAF7EC;
-    --muted:#87A491;
-    --danger:#FF5C5C;
-    --warning:#FFC94A;
-    --radius:10px;
+    --bg:#050B08;
+    --glass:rgba(255,255,255,.045);
+    --glass-strong:rgba(20,45,32,.55);
+    --glass-border:rgba(255,255,255,.09);
+    --neon:#4CFFA0;
+    --neon-soft:#9CFFC9;
+    --deep:#0E3F27;
+    --text:#EAFBF1;
+    --muted:#7FA793;
+    --danger:#FF6B6B;
+    --warning:#FFD166;
+    --radius:18px;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%;}
@@ -31,265 +31,250 @@
     font-family:'Tajawal', sans-serif;
     min-height:100vh;
     overflow-x:hidden;
-  }
-  h1,h2,h3,.brand,.stat-value,.hero-value{ font-family:'Cairo', sans-serif; }
-
-  /* ===== خلفية أسفلت خفيفة ===== */
-  body::before{
-    content:'';
-    position:fixed; inset:0;
-    background-image:
-      repeating-linear-gradient(115deg, rgba(140,255,61,0.025) 0 2px, transparent 2px 60px);
-    pointer-events:none;
-    z-index:0;
-  }
-
-  /* ===================== شاشة الدخول ===================== */
-  #loginScreen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
     position:relative;
-    z-index:1;
-    padding:24px;
   }
-  .gate-bar{
-    position:absolute; top:0; left:0; right:0; height:10px;
-    background:repeating-linear-gradient(-45deg, var(--neon) 0 18px, #0A100C 18px 36px);
-    opacity:.85;
+  h1,h2,h3,.brand,.stat-value,.hero-value,.card h4{ font-family:'Cairo', sans-serif; }
+  ::selection{ background:rgba(76,255,160,.3); }
+
+  /* ===================== خلفية متحركة من فقاعات الضوء الأخضر ===================== */
+  .blob-field{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .blob{
+    position:absolute; border-radius:50%;
+    filter:blur(70px);
+    opacity:.55;
+    mix-blend-mode:screen;
+  }
+  .blob1{ width:520px; height:520px; background:radial-gradient(circle at 30% 30%, #37E88F, transparent 70%); top:-160px; right:-120px; animation:float1 22s ease-in-out infinite alternate; }
+  .blob2{ width:420px; height:420px; background:radial-gradient(circle at 60% 40%, #0E7A47, transparent 70%); bottom:-140px; left:-100px; animation:float2 26s ease-in-out infinite alternate; }
+  .blob3{ width:300px; height:300px; background:radial-gradient(circle at 50% 50%, #22C57A, transparent 70%); top:40%; left:35%; animation:float3 30s ease-in-out infinite alternate; opacity:.35; }
+  @keyframes float1{ from{ transform:translate(0,0) scale(1);} to{ transform:translate(-60px,60px) scale(1.12);} }
+  @keyframes float2{ from{ transform:translate(0,0) scale(1);} to{ transform:translate(50px,-40px) scale(1.08);} }
+  @keyframes float3{ from{ transform:translate(0,0);} to{ transform:translate(40px,50px);} }
+  @media (prefers-reduced-motion: reduce){ .blob{ animation:none !important; } }
+
+  .grain{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:3px 3px; opacity:.5; }
+
+  /* ===================== عناصر زجاجية عامة ===================== */
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(22px) saturate(150%);
+    -webkit-backdrop-filter:blur(22px) saturate(150%);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius);
+  }
+
+  /* ===================== شاشة تسجيل الدخول ===================== */
+  #loginScreen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    position:relative; z-index:1; padding:24px;
   }
   .login-card{
     width:100%; max-width:400px;
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:38px 32px 32px;
+    padding:42px 34px 34px;
     position:relative;
+    animation:riseIn .6s cubic-bezier(.2,.9,.25,1);
   }
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(18px) scale(.98);} to{ opacity:1; transform:translateY(0) scale(1);} }
+  .login-glow{
+    position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(76,255,160,.5), transparent 70%);
+    filter:blur(30px); z-index:-1; animation:pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:.6; transform:translateX(-50%) scale(1);} 50%{ opacity:1; transform:translateX(-50%) scale(1.1);} }
   .login-card .tag{
-    display:inline-block;
-    font-size:12px;
-    color:var(--neon);
-    border:1px solid var(--deep);
-    padding:3px 10px;
-    border-radius:999px;
-    margin-bottom:16px;
-    background:rgba(140,255,61,.06);
+    display:inline-block; font-size:12px; color:var(--neon-soft);
+    border:1px solid rgba(76,255,160,.3); padding:4px 12px; border-radius:999px;
+    margin-bottom:18px; background:rgba(76,255,160,.06);
   }
-  .login-card h1{
-    font-size:28px; font-weight:900; margin-bottom:4px; letter-spacing:.5px;
-  }
+  .login-card h1{ font-size:30px; font-weight:900; margin-bottom:6px; text-shadow:0 0 24px rgba(76,255,160,.35); }
   .login-card h1 span{ color:var(--neon); }
-  .login-card p.sub{ color:var(--muted); font-size:14px; margin-bottom:28px; }
-  .field{ margin-bottom:16px; }
-  .field label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .login-card p.sub{ color:var(--muted); font-size:14px; margin-bottom:30px; line-height:1.6; }
+  .field{ margin-bottom:17px; }
+  .field label{ display:block; font-size:13px; color:var(--muted); margin-bottom:7px; }
   .field input{
-    width:100%;
-    background:var(--bg);
-    border:1px solid var(--line);
-    color:var(--text);
-    padding:12px 14px;
-    border-radius:8px;
-    font-family:'Tajawal', sans-serif;
-    font-size:15px;
-    transition:border-color .15s;
+    width:100%; background:rgba(255,255,255,.04); border:1px solid var(--glass-border);
+    color:var(--text); padding:13px 15px; border-radius:12px;
+    font-family:'Tajawal'; font-size:15px; transition:border-color .2s, background .2s;
   }
-  .field input:focus{ outline:none; border-color:var(--neon); }
+  .field input:focus{ outline:none; border-color:var(--neon); background:rgba(76,255,160,.05); }
   .btn-primary{
-    width:100%;
-    background:var(--neon);
-    color:#08130A;
-    border:none;
-    padding:13px;
-    font-family:'Cairo', sans-serif;
-    font-weight:800;
-    font-size:15px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-top:6px;
+    width:100%; background:linear-gradient(135deg, var(--neon), #1FA968);
+    color:#04150C; border:none; padding:14px; font-family:'Cairo'; font-weight:800; font-size:15px;
+    border-radius:12px; cursor:pointer; margin-top:8px;
+    box-shadow:0 10px 30px -8px rgba(76,255,160,.5);
     transition:filter .15s, transform .1s;
   }
-  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-primary:hover{ filter:brightness(1.06); }
   .btn-primary:active{ transform:scale(.98); }
   .btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
   #loginError{
-    color:var(--danger);
-    font-size:13px;
-    margin-top:14px;
-    display:none;
-    padding:10px 12px;
-    background:rgba(255,92,92,.08);
-    border:1px solid rgba(255,92,92,.25);
-    border-radius:8px;
+    color:var(--danger); font-size:13px; margin-top:16px; display:none;
+    padding:11px 13px; background:rgba(255,107,107,.08); border:1px solid rgba(255,107,107,.25); border-radius:10px;
   }
 
-  /* ===================== التطبيق الرئيسي ===================== */
+  /* ===================== التطبيق ===================== */
   #app{ display:none; min-height:100vh; position:relative; z-index:1; }
   .layout{ display:flex; min-height:100vh; }
 
-  /* --- القائمة الجانبية --- */
   .sidebar{
     width:250px; flex-shrink:0;
-    background:var(--panel);
-    border-left:1px solid var(--line);
+    margin:16px 0 16px 0; margin-right:16px;
+    border-radius:22px;
     display:flex; flex-direction:column;
-    position:sticky; top:0; height:100vh;
+    position:sticky; top:16px; height:calc(100vh - 32px);
   }
-  .sidebar-head{ padding:26px 20px 18px; border-bottom:1px solid var(--line); }
-  .sidebar-head .brand{ font-size:20px; font-weight:900; }
+  .sidebar-head{ padding:24px 20px 16px; border-bottom:1px solid var(--glass-border); }
+  .sidebar-head .brand{ font-size:19px; font-weight:900; }
   .sidebar-head .brand span{ color:var(--neon); }
-  .sidebar-head .brand-sub{ font-size:11px; color:var(--muted); margin-top:4px; }
+  .sidebar-head .brand-sub{ font-size:11px; color:var(--muted); margin-top:5px; line-height:1.5; }
   .nav{ flex:1; padding:14px 12px; overflow-y:auto; }
   .nav-item{
-    display:flex; align-items:center; gap:10px;
-    padding:11px 12px;
-    border-radius:8px;
-    color:var(--muted);
-    cursor:pointer;
-    font-size:14px;
-    font-weight:500;
-    margin-bottom:4px;
-    border-right:3px solid transparent;
-    transition:background .15s, color .15s;
+    display:flex; align-items:center; gap:11px; padding:11px 13px; border-radius:12px;
+    color:var(--muted); cursor:pointer; font-size:14px; font-weight:500; margin-bottom:5px;
+    transition:background .2s, color .2s, transform .1s;
   }
   .nav-item svg{ width:18px; height:18px; flex-shrink:0; }
-  .nav-item:hover{ background:var(--panel-alt); color:var(--text); }
+  .nav-item:hover{ background:rgba(255,255,255,.05); color:var(--text); transform:translateX(-2px); }
   .nav-item.active{
-    background:rgba(140,255,61,.08);
-    color:var(--neon);
-    border-color:var(--neon);
+    background:linear-gradient(90deg, rgba(76,255,160,.16), rgba(76,255,160,.02));
+    color:var(--neon); box-shadow:inset 0 0 0 1px rgba(76,255,160,.25);
   }
-  .sidebar-foot{
-    padding:16px 20px; border-top:1px solid var(--line);
-    font-size:13px;
-  }
+  .sidebar-foot{ padding:16px 20px; border-top:1px solid var(--glass-border); font-size:13px; }
   .sidebar-foot .u-name{ font-weight:700; }
-  .sidebar-foot .u-role{ color:var(--muted); font-size:12px; margin-bottom:10px; }
+  .sidebar-foot .u-role{ color:var(--muted); font-size:12px; margin-bottom:11px; }
   .logout-btn{
-    width:100%; background:transparent; border:1px solid var(--line);
-    color:var(--muted); padding:8px; border-radius:6px; cursor:pointer;
-    font-family:'Tajawal'; font-size:13px;
+    width:100%; background:transparent; border:1px solid var(--glass-border); color:var(--muted);
+    padding:9px; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-size:13px; transition:.2s;
   }
   .logout-btn:hover{ border-color:var(--danger); color:var(--danger); }
 
-  /* --- المحتوى الرئيسي --- */
-  .main{ flex:1; min-width:0; padding:28px 32px 60px; }
-  .topbar{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:26px;
-  }
-  .topbar h2{ font-size:22px; font-weight:800; }
+  .main{ flex:1; min-width:0; padding:28px 28px 60px 0; }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+  .topbar h2{ font-size:23px; font-weight:800; }
   .topbar .date{ color:var(--muted); font-size:13px; }
 
-  .page{ display:none; animation:fade .25s ease; }
-  .page.active{ display:block; }
-  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .page{ display:none; }
+  .page.active{ display:block; animation:fade .35s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
 
-  /* --- شريط البطل الخاص بكل صفحة --- */
+  /* ===================== صفحة الرئيسية ===================== */
+  .welcome-strip{
+    padding:26px 28px; margin-bottom:22px; position:relative; overflow:hidden;
+  }
+  .welcome-strip::after{
+    content:''; position:absolute; inset:0; background:radial-gradient(circle at 90% 20%, rgba(76,255,160,.12), transparent 60%);
+  }
+  .welcome-strip h3{ font-size:22px; font-weight:800; margin-bottom:6px; position:relative; }
+  .welcome-strip p{ color:var(--muted); font-size:13.5px; position:relative; }
+
+  .home-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:16px; margin-bottom:22px;
+  }
+  .module-card{
+    padding:22px 22px 20px; cursor:pointer; position:relative; overflow:hidden;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .module-card:hover{ transform:translateY(-4px); box-shadow:0 16px 40px -14px rgba(76,255,160,.25); }
+  .module-card .m-icon{
+    width:38px; height:38px; color:var(--neon); margin-bottom:14px; opacity:.9;
+  }
+  .module-card .m-label{ font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .module-card .m-value{ font-size:28px; font-weight:900; margin-bottom:10px; text-shadow:0 0 18px rgba(76,255,160,.25); }
+  .module-card .m-foot{ font-size:12px; color:var(--muted); display:flex; gap:10px; flex-wrap:wrap; }
+  .module-card .m-foot b{ color:var(--text); }
+  .module-card .glow-corner{
+    position:absolute; width:120px; height:120px; border-radius:50%;
+    background:radial-gradient(circle, rgba(76,255,160,.25), transparent 70%);
+    top:-40px; left:-40px; pointer-events:none;
+  }
+
+  .alerts-card{ padding:22px 24px; margin-bottom:22px; }
+  .alerts-card h4{ font-size:15px; margin-bottom:14px; color:var(--text); font-weight:800; }
+  .alert-row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:11px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13.5px;
+  }
+  .alert-row:last-child{ border-bottom:none; }
+  .alert-row .a-title{ color:var(--text); }
+  .alert-row .a-sub{ color:var(--muted); font-size:12px; }
+
+  /* ===================== شريط البطل الخاص بكل صفحة ===================== */
   .hero{
-    position:relative; overflow:hidden;
-    border-radius:14px;
-    border:1px solid var(--line);
-    background:linear-gradient(135deg, var(--panel), var(--panel-alt));
-    padding:26px 28px;
-    margin-bottom:22px;
+    position:relative; overflow:hidden; padding:28px 30px; margin-bottom:22px;
     display:flex; align-items:center; justify-content:space-between; gap:20px;
   }
-  .hero .hero-icon{ width:52px; height:52px; color:var(--neon); flex-shrink:0; opacity:.9;}
-  .hero-text h3{ font-size:15px; color:var(--muted); font-weight:500; margin-bottom:4px;}
-  .hero-value{ font-size:34px; font-weight:900; }
-  .hero-value span{ font-size:16px; color:var(--muted); font-weight:500; margin-right:6px; }
+  .hero .hero-icon{ width:54px; height:54px; color:var(--neon); flex-shrink:0; opacity:.9; filter:drop-shadow(0 0 14px rgba(76,255,160,.4)); }
+  .hero-text h3{ font-size:15px; color:var(--muted); font-weight:500; margin-bottom:5px; }
+  .hero-value{ font-size:36px; font-weight:900; text-shadow:0 0 22px rgba(76,255,160,.3); }
+  .hero-value span{ font-size:16px; color:var(--muted); font-weight:500; margin-right:6px; text-shadow:none; }
+  .hero::after{
+    content:''; position:absolute; width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(76,255,160,.14), transparent 70%);
+    top:-100px; left:-60px; pointer-events:none;
+  }
 
-  /* motif زخرفي مختلف لكل قسم */
-  .hero.motif-road::after{
-    content:''; position:absolute; inset:0; left:auto; width:55%;
-    background-image:repeating-linear-gradient(90deg, var(--neon) 0 26px, transparent 26px 52px);
-    background-position:bottom 14px right 0; background-repeat:no-repeat; height:3px; top:auto; bottom:0;
-    opacity:.5;
-  }
-  .hero.motif-stripes::before{
-    content:''; position:absolute; inset:0;
-    background:repeating-linear-gradient(-45deg, rgba(255,201,74,.05) 0 14px, transparent 14px 28px);
-  }
-  .hero.motif-stamp .hero-icon{ color:var(--warning); }
-
-  /* --- كروت الإحصائيات --- */
-  .stats-grid{
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr));
-    gap:14px; margin-bottom:22px;
-  }
-  .stat-card{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:18px 20px;
-  }
-  .stat-card .stat-label{ font-size:13px; color:var(--muted); margin-bottom:8px; }
+  /* ===================== كروت الإحصائيات ===================== */
+  .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:14px; margin-bottom:22px; }
+  .stat-card{ padding:19px 20px; transition:transform .2s; }
+  .stat-card:hover{ transform:translateY(-3px); }
+  .stat-card .stat-label{ font-size:13px; color:var(--muted); margin-bottom:9px; }
   .stat-card .stat-value{ font-size:26px; font-weight:800; }
   .stat-card.ok .stat-value{ color:var(--neon); }
   .stat-card.warn .stat-value{ color:var(--warning); }
   .stat-card.danger .stat-value{ color:var(--danger); }
 
-  /* --- شبكة الرسم البياني + الجدول --- */
-  .content-grid{
-    display:grid; grid-template-columns:340px 1fr; gap:18px; align-items:start;
-  }
+  .content-grid{ display:grid; grid-template-columns:340px 1fr; gap:18px; align-items:start; }
   @media (max-width:900px){ .content-grid{ grid-template-columns:1fr; } }
 
-  .card{
-    background:var(--panel); border:1px solid var(--line);
-    border-radius:12px; padding:20px;
-  }
-  .card h4{ font-size:14px; color:var(--muted); font-weight:700; margin-bottom:14px; }
+  .card{ padding:22px; }
+  .card h4{ font-size:14px; color:var(--muted); font-weight:700; margin-bottom:15px; }
   .chart-wrap{ position:relative; height:230px; }
 
   .table-scroll{ overflow-x:auto; }
   table{ width:100%; border-collapse:collapse; font-size:13px; white-space:nowrap; }
-  thead th{
-    text-align:right; padding:10px 12px; color:var(--muted);
-    border-bottom:1px solid var(--line); font-weight:700; position:sticky; top:0; background:var(--panel);
-  }
-  tbody td{ padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.03); }
-  tbody tr:hover{ background:var(--panel-alt); }
-  .badge{
-    display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700;
-  }
-  .badge.green{ background:rgba(140,255,61,.12); color:var(--neon); }
-  .badge.amber{ background:rgba(255,201,74,.12); color:var(--warning); }
-  .badge.red{ background:rgba(255,92,92,.12); color:var(--danger); }
-  .badge.gray{ background:rgba(255,255,255,.06); color:var(--muted); }
+  thead th{ text-align:right; padding:10px 12px; color:var(--muted); border-bottom:1px solid var(--glass-border); font-weight:700; position:sticky; top:0; }
+  tbody td{ padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.04); }
+  tbody tr{ transition:background .15s; }
+  tbody tr:hover{ background:rgba(76,255,160,.04); }
+  .badge{ display:inline-block; padding:3px 11px; border-radius:999px; font-size:11px; font-weight:700; }
+  .badge.green{ background:rgba(76,255,160,.14); color:var(--neon); }
+  .badge.amber{ background:rgba(255,209,102,.14); color:var(--warning); }
+  .badge.red{ background:rgba(255,107,107,.14); color:var(--danger); }
+  .badge.gray{ background:rgba(255,255,255,.07); color:var(--muted); }
 
-  .empty-state{
-    text-align:center; padding:60px 20px; color:var(--muted);
-  }
-  .empty-state svg{ width:46px; height:46px; margin-bottom:14px; color:var(--deep); }
+  .empty-state{ text-align:center; padding:70px 20px; color:var(--muted); }
+  .empty-state svg{ width:48px; height:48px; margin-bottom:16px; color:var(--neon); opacity:.5; }
 
-  .loading{ text-align:center; padding:60px; color:var(--muted); font-size:14px; }
-
-  /* موبايل: قائمة جانبية قابلة للطي */
   .menu-toggle{ display:none; }
   @media (max-width:820px){
-    .sidebar{ position:fixed; right:0; top:0; z-index:50; transform:translateX(100%); transition:transform .2s; box-shadow:-10px 0 30px rgba(0,0,0,.4); }
+    .sidebar{ position:fixed; right:12px; top:12px; z-index:50; height:calc(100vh - 24px);
+      transform:translateX(120%); transition:transform .25s; margin:0; }
     .sidebar.open{ transform:translateX(0); }
     .main{ padding:20px 16px 50px; }
-    .menu-toggle{
-      display:flex; align-items:center; justify-content:center;
-      width:38px; height:38px; border-radius:8px; border:1px solid var(--line);
-      background:var(--panel); color:var(--text); cursor:pointer;
-    }
+    .menu-toggle{ display:flex; align-items:center; justify-content:center; width:40px; height:40px;
+      border-radius:12px; cursor:pointer; color:var(--text); font-size:18px; }
   }
 </style>
 </head>
 <body>
 
+<div class="blob-field">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+<div class="grain"></div>
+
 <!-- ===================== شاشة تسجيل الدخول ===================== -->
 <div id="loginScreen">
-  <div class="login-card">
-    <div class="gate-bar"></div>
+  <div class="login-card glass">
+    <div class="login-glow"></div>
     <span class="tag">نظام إدارة داخلي</span>
     <h1>Fleet <span>GMC</span></h1>
-    <p class="sub">إدارة حركة وأسطول شركة المقاولات</p>
+    <p class="sub">إدارة حركة وأسطول شركة المقاولات — كل البيانات في مكان واحد</p>
     <form id="loginForm">
       <div class="field">
         <label>اسم المستخدم</label>
@@ -308,7 +293,7 @@
 <!-- ===================== التطبيق ===================== -->
 <div id="app">
   <div class="layout">
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar glass" id="sidebar">
       <div class="sidebar-head">
         <div class="brand">Fleet <span>GMC</span></div>
         <div class="brand-sub">إدارة حركة وأسطول المقاولات</div>
@@ -323,14 +308,27 @@
 
     <main class="main">
       <div class="topbar">
-        <button class="menu-toggle" id="menuToggle">≡</button>
+        <button class="menu-toggle glass" id="menuToggle">≡</button>
         <h2 id="pageTitle">الرئيسية</h2>
         <div class="date" id="topDate"></div>
       </div>
 
+      <!-- ===== صفحة الرئيسية ===== -->
+      <section class="page active" id="page-HOME">
+        <div class="welcome-strip glass">
+          <h3 id="welcomeText">أهلًا بيك 👋</h3>
+          <p>نظرة سريعة على كل حاجة شغالة دلوقتي — ادخل أي قسم من القائمة عشان تشوف تفاصيل أكتر</p>
+        </div>
+        <div class="home-grid" id="homeGrid"></div>
+        <div class="alerts-card glass">
+          <h4>أهم التنبيهات</h4>
+          <div id="alertsList"><div class="loading" style="color:var(--muted); font-size:13px;">جارٍ التحميل...</div></div>
+        </div>
+      </section>
+
       <!-- ===== صفحة الحركة (Fleet) ===== -->
       <section class="page" id="page-FLEET">
-        <div class="hero motif-road">
+        <div class="hero glass">
           <div class="hero-text">
             <h3>إجمالي المأموريات المسجلة</h3>
             <div class="hero-value" id="fleet-total">—</div>
@@ -339,22 +337,20 @@
         </div>
         <div class="stats-grid" id="fleet-stats"></div>
         <div class="content-grid">
-          <div class="card">
+          <div class="card glass">
             <h4>مفتوحة مقابل مغلقة</h4>
             <div class="chart-wrap"><canvas id="fleet-chart"></canvas></div>
           </div>
-          <div class="card">
+          <div class="card glass">
             <h4>سجل المأموريات</h4>
-            <div class="table-scroll">
-              <table id="fleet-table"><thead></thead><tbody></tbody></table>
-            </div>
+            <div class="table-scroll"><table id="fleet-table"><thead></thead><tbody></tbody></table></div>
           </div>
         </div>
       </section>
 
       <!-- ===== صفحة الصيانة ===== -->
       <section class="page" id="page-MAINTENANCE">
-        <div class="hero">
+        <div class="hero glass">
           <div class="hero-text">
             <h3>إجمالي التكلفة التقريبية للصيانة</h3>
             <div class="hero-value" id="maint-cost">—</div>
@@ -363,22 +359,20 @@
         </div>
         <div class="stats-grid" id="maint-stats"></div>
         <div class="content-grid">
-          <div class="card">
+          <div class="card glass">
             <h4>حالة الأسطول</h4>
             <div class="chart-wrap"><canvas id="maint-chart"></canvas></div>
           </div>
-          <div class="card">
+          <div class="card glass">
             <h4>سجل الصيانة</h4>
-            <div class="table-scroll">
-              <table id="maint-table"><thead></thead><tbody></tbody></table>
-            </div>
+            <div class="table-scroll"><table id="maint-table"><thead></thead><tbody></tbody></table></div>
           </div>
         </div>
       </section>
 
       <!-- ===== صفحة التراخيص ===== -->
       <section class="page" id="page-LICENSES">
-        <div class="hero motif-stamp">
+        <div class="hero glass">
           <div class="hero-text">
             <h3>رخص محتاجة متابعة عاجلة (خلال 30 يوم أو منتهية)</h3>
             <div class="hero-value" id="lic-urgent">—</div>
@@ -387,22 +381,20 @@
         </div>
         <div class="stats-grid" id="lic-stats"></div>
         <div class="content-grid">
-          <div class="card">
+          <div class="card glass">
             <h4>توزيع حالة الرخص</h4>
             <div class="chart-wrap"><canvas id="lic-chart"></canvas></div>
           </div>
-          <div class="card">
+          <div class="card glass">
             <h4>الرخص مرتبة حسب الأقرب انتهاءً</h4>
-            <div class="table-scroll">
-              <table id="lic-table"><thead></thead><tbody></tbody></table>
-            </div>
+            <div class="table-scroll"><table id="lic-table"><thead></thead><tbody></tbody></table></div>
           </div>
         </div>
       </section>
 
       <!-- ===== صفحة المخالفات ===== -->
       <section class="page" id="page-VIOLATIONS">
-        <div class="hero motif-stripes">
+        <div class="hero glass">
           <div class="hero-text">
             <h3>إجمالي قيمة المخالفات المسجلة</h3>
             <div class="hero-value" id="viol-value">—</div>
@@ -411,22 +403,20 @@
         </div>
         <div class="stats-grid" id="viol-stats"></div>
         <div class="content-grid">
-          <div class="card">
+          <div class="card glass">
             <h4>أعلى 5 حسب قيمة المخالفات</h4>
             <div class="chart-wrap"><canvas id="viol-chart"></canvas></div>
           </div>
-          <div class="card">
+          <div class="card glass">
             <h4>سجل المخالفات</h4>
-            <div class="table-scroll">
-              <table id="viol-table"><thead></thead><tbody></tbody></table>
-            </div>
+            <div class="table-scroll"><table id="viol-table"><thead></thead><tbody></tbody></table></div>
           </div>
         </div>
       </section>
 
       <!-- ===== صفحة التأمين (قيد الإنشاء) ===== -->
       <section class="page" id="page-INSURANCE">
-        <div class="empty-state">
+        <div class="empty-state glass">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3z"/></svg>
           <h3>قسم التأمينات قيد الإنشاء</h3>
           <p style="margin-top:6px; font-size:13px;">هيتفعّل تلقائيًا فور إضافة بيانات شيت Insurance</p>
@@ -439,21 +429,21 @@
 
 <script>
 /* =========================================================
-   إعدادات الاتصال — غيّر اللينك ده بلينك الـ Web App بتاعك
+   إعدادات الاتصال
    ========================================================= */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyhGKa1md7DZZviRl5VJ2u41jHUN7DOZfqqwjDZTS_CuUa1B1dPMRxP61PKP_AsZD801w/exec';
 
-/* تعريف الصفحات: المفتاح لازم يطابق مفتاح permissions الراجع من تسجيل الدخول */
 const MODULES = [
-  { key:'FLEET',       label:'الحركة والمأموريات', action:'getFleet',       icon: navIcon('road') },
-  { key:'MAINTENANCE', label:'الصيانة',            action:'getMaintenance', icon: navIcon('wrench') },
-  { key:'LICENSES',    label:'التراخيص',           action:'getLicenses',    icon: navIcon('doc') },
-  { key:'VIOLATIONS',  label:'المخالفات المرورية',  action:'getViolations',  icon: navIcon('warn') },
-  { key:'INSURANCE',   label:'التأمينات',          action:null,             icon: navIcon('shield') },
+  { key:'FLEET',       label:'الحركة والمأموريات', action:'getFleet',       icon: navIcon('road'),   unit:'مأمورية' },
+  { key:'MAINTENANCE', label:'الصيانة',            action:'getMaintenance', icon: navIcon('wrench'), unit:'جنيه' },
+  { key:'LICENSES',    label:'التراخيص',           action:'getLicenses',    icon: navIcon('doc'),    unit:'رخصة' },
+  { key:'VIOLATIONS',  label:'المخالفات المرورية',  action:'getViolations',  icon: navIcon('warn'),   unit:'جنيه' },
+  { key:'INSURANCE',   label:'التأمينات',          action:null,             icon: navIcon('shield'), unit:'' },
 ];
 
 function navIcon(name){
   const icons = {
+    home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/>',
     road:'<path d="M12 2v6M12 16v6M9 2l-2 20M15 2l2 20"/>',
     wrench:'<path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4L14.7 6.3z"/>',
     doc:'<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/>',
@@ -465,15 +455,13 @@ function navIcon(name){
 
 let session = { token:null, name:null, role:null, permissions:{} };
 let charts = {};
+let moduleResults = {}; // key -> {data, summary}
 
 /* ---------- أدوات مساعدة ---------- */
 function getVal(row, ...names){
   for(const n of names){ if(row[n] !== undefined) return row[n]; }
   const keys = Object.keys(row);
-  for(const n of names){
-    const found = keys.find(k => k.includes(n));
-    if(found) return row[found];
-  }
+  for(const n of names){ const found = keys.find(k => k.includes(n)); if(found) return row[found]; }
   return '';
 }
 function fmtDate(v){
@@ -547,17 +535,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 document.getElementById('logoutBtn').addEventListener('click', () => {
   sessionStorage.removeItem('fleetgmc_session');
   session = { token:null, name:null, role:null, permissions:{} };
+  moduleResults = {};
   document.getElementById('app').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('password').value = '';
 });
 
-/* استرجاع جلسة سابقة لو موجودة في نفس التبويب */
 (function tryRestoreSession(){
   const saved = sessionStorage.getItem('fleetgmc_session');
-  if(saved){
-    try{ session = JSON.parse(saved); startApp(); }catch(e){}
-  }
+  if(saved){ try{ session = JSON.parse(saved); startApp(); }catch(e){} }
 })();
 
 /* ---------- بناء الواجهة بعد الدخول ---------- */
@@ -567,14 +553,22 @@ function startApp(){
   document.getElementById('userName').textContent = session.name;
   document.getElementById('userRole').textContent =
     session.role === 'Admin' ? 'مدير النظام' : session.role === 'Manager' ? 'مدير' : 'موظف';
+  document.getElementById('welcomeText').textContent = `أهلًا بيك، ${session.name} 👋`;
 
   const nav = document.getElementById('navList');
   nav.innerHTML = '';
-  const allowed = MODULES.filter(m => session.permissions[m.key]);
 
-  allowed.forEach((m, idx) => {
+  const homeItem = document.createElement('div');
+  homeItem.className = 'nav-item active';
+  homeItem.dataset.key = 'HOME';
+  homeItem.innerHTML = `${navIcon('home')}<span>الرئيسية</span>`;
+  homeItem.addEventListener('click', () => switchPage({ key:'HOME', label:'الرئيسية', action:null }));
+  nav.appendChild(homeItem);
+
+  const allowed = MODULES.filter(m => session.permissions[m.key]);
+  allowed.forEach(m => {
     const el = document.createElement('div');
-    el.className = 'nav-item' + (idx === 0 ? ' active' : '');
+    el.className = 'nav-item';
     el.dataset.key = m.key;
     el.innerHTML = `${m.icon}<span>${m.label}</span>`;
     el.addEventListener('click', () => switchPage(m));
@@ -584,7 +578,8 @@ function startApp(){
   document.getElementById('topDate').textContent =
     new Date().toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  if(allowed.length > 0) switchPage(allowed[0]);
+  buildHomeSkeleton(allowed);
+  preloadAllModules(allowed);
 }
 
 function switchPage(module){
@@ -593,41 +588,131 @@ function switchPage(module){
   document.getElementById('page-' + module.key).classList.add('active');
   document.getElementById('pageTitle').textContent = module.label;
   document.getElementById('sidebar').classList.remove('open');
-
-  if(module.action) loadModuleData(module);
+  if(module.action && moduleResults[module.key]) renderModule(module.key, moduleResults[module.key]);
 }
 
 document.getElementById('menuToggle').addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
 });
 
-/* ---------- تحميل بيانات كل قسم ---------- */
-const loadedOnce = {};
-async function loadModuleData(module){
-  if(loadedOnce[module.key]) return; // تحميل مرة واحدة لكل جلسة، لتقليل عدد الطلبات
-  const res = await apiCall(module.action);
-  if(!res.success){
-    alert(res.error || 'تعذر تحميل البيانات');
-    return;
-  }
-  loadedOnce[module.key] = true;
-
-  if(module.key === 'FLEET') renderFleet(res.data, res.summary);
-  if(module.key === 'MAINTENANCE') renderMaintenance(res.data, res.summary);
-  if(module.key === 'LICENSES') renderLicenses(res.data, res.summary);
-  if(module.key === 'VIOLATIONS') renderViolations(res.data, res.summary);
+/* ---------- تحميل كل الأقسام مرة واحدة عند الدخول ---------- */
+async function preloadAllModules(allowed){
+  const withAction = allowed.filter(m => m.action);
+  await Promise.all(withAction.map(async m => {
+    try{
+      const res = await apiCall(m.action);
+      if(res.success){
+        moduleResults[m.key] = { data:res.data, summary:res.summary };
+        renderModule(m.key, moduleResults[m.key]);
+        updateHomeCard(m);
+      }
+    }catch(e){ /* تجاهل فشل قسم واحد، الباقي يكمل */ }
+  }));
+  renderAlerts(allowed);
 }
 
-/* ===== عرض الحركة ===== */
+/* ---------- بناء كروت الرئيسية ---------- */
+function buildHomeSkeleton(allowed){
+  const grid = document.getElementById('homeGrid');
+  grid.innerHTML = '';
+  allowed.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'module-card glass';
+    card.id = 'home-card-' + m.key;
+    card.innerHTML = `
+      <div class="glow-corner"></div>
+      <div class="m-icon">${m.icon}</div>
+      <div class="m-label">${m.label}</div>
+      <div class="m-value">${m.action ? '...' : 'قريبًا'}</div>
+      <div class="m-foot"></div>
+    `;
+    card.querySelector('.m-icon').innerHTML = m.icon;
+    if(m.action){
+      card.addEventListener('click', () => switchPage(m));
+    }
+    grid.appendChild(card);
+  });
+}
+
+function updateHomeCard(module){
+  const card = document.getElementById('home-card-' + module.key);
+  if(!card) return;
+  const summary = moduleResults[module.key].summary;
+  const valueEl = card.querySelector('.m-value');
+  const footEl = card.querySelector('.m-foot');
+
+  if(module.key === 'FLEET'){
+    valueEl.textContent = fmtNum(summary.total) + ' مأمورية';
+    footEl.innerHTML = `<span><b>${fmtNum(summary.open)}</b> مفتوحة</span><span><b>${fmtNum(summary.closed)}</b> مغلقة</span>`;
+  }
+  if(module.key === 'MAINTENANCE'){
+    valueEl.textContent = fmtNum(summary.totalEstimatedCost) + ' جنيه';
+    footEl.innerHTML = `<span><b>${fmtNum(summary.inProgress)}</b> تحت الصيانة</span><span><b>${fmtNum(summary.notDone)}</b> بانتظار الصيانة</span>`;
+  }
+  if(module.key === 'LICENSES'){
+    valueEl.textContent = fmtNum(summary.expired + summary.expiringSoon) + ' تحتاج متابعة';
+    footEl.innerHTML = `<span><b>${fmtNum(summary.expired)}</b> منتهية</span><span><b>${fmtNum(summary.expiringSoon)}</b> قريبة</span>`;
+  }
+  if(module.key === 'VIOLATIONS'){
+    valueEl.textContent = fmtNum(summary.totalViolationsValue) + ' جنيه';
+    footEl.innerHTML = `<span><b>${fmtNum(summary.totalViolationsCount)}</b> مخالفة</span>`;
+  }
+}
+
+function renderAlerts(allowed){
+  const list = document.getElementById('alertsList');
+  const rows = [];
+
+  if(moduleResults.LICENSES){
+    const s = moduleResults.LICENSES.summary;
+    if(s.expired > 0) rows.push({ title:`${s.expired} رخصة منتهية بالفعل`, sub:'محتاجة تجديد فورًا', type:'red' });
+    if(s.expiringSoon > 0) rows.push({ title:`${s.expiringSoon} رخصة هتنتهي خلال 30 يوم`, sub:'ابدأ إجراءات التجديد', type:'amber' });
+  }
+  if(moduleResults.MAINTENANCE){
+    const s = moduleResults.MAINTENANCE.summary;
+    if(s.notDone > 0) rows.push({ title:`${s.notDone} سيارة لسه محتاجة صيانة`, sub:'لم تتم الصيانة بعد', type:'red' });
+    if(s.inProgress > 0) rows.push({ title:`${s.inProgress} سيارة تحت الصيانة دلوقتي`, sub:'متابعة الورشة', type:'amber' });
+  }
+  if(moduleResults.FLEET){
+    const s = moduleResults.FLEET.summary;
+    if(s.open > 0) rows.push({ title:`${s.open} مأمورية لسه مفتوحة`, sub:'لم يتم تسجيل الرجوع', type:'amber' });
+  }
+  if(moduleResults.VIOLATIONS){
+    const s = moduleResults.VIOLATIONS.summary;
+    if(s.totalViolationsCount > 0) rows.push({ title:`${s.totalViolationsCount} مخالفة مسجلة`, sub:`بقيمة إجمالية ${fmtNum(s.totalViolationsValue)} جنيه`, type:'gray' });
+  }
+
+  if(rows.length === 0){
+    list.innerHTML = `<div style="color:var(--muted); font-size:13px;">مفيش تنبيهات عاجلة دلوقتي 🌿</div>`;
+    return;
+  }
+  list.innerHTML = rows.map(r => `
+    <div class="alert-row">
+      <div>
+        <div class="a-title">${r.title}</div>
+        <div class="a-sub">${r.sub}</div>
+      </div>
+      <span class="badge ${r.type}">تنبيه</span>
+    </div>
+  `).join('');
+}
+
+/* ---------- عرض بيانات كل قسم ---------- */
+function renderModule(key, result){
+  if(key === 'FLEET') renderFleet(result.data, result.summary);
+  if(key === 'MAINTENANCE') renderMaintenance(result.data, result.summary);
+  if(key === 'LICENSES') renderLicenses(result.data, result.summary);
+  if(key === 'VIOLATIONS') renderViolations(result.data, result.summary);
+}
+
 function renderFleet(data, summary){
   document.getElementById('fleet-total').innerHTML = `${fmtNum(summary.total)} <span>مأمورية</span>`;
   document.getElementById('fleet-stats').innerHTML = `
-    <div class="stat-card warn"><div class="stat-label">مأموريات مفتوحة</div><div class="stat-value">${fmtNum(summary.open)}</div></div>
-    <div class="stat-card ok"><div class="stat-label">مأموريات مغلقة</div><div class="stat-value">${fmtNum(summary.closed)}</div></div>
-    <div class="stat-card"><div class="stat-label">إجمالي المسافات المقطوعة</div><div class="stat-value">${fmtNum(summary.totalDistance)} كم</div></div>
+    <div class="stat-card glass warn"><div class="stat-label">مأموريات مفتوحة</div><div class="stat-value">${fmtNum(summary.open)}</div></div>
+    <div class="stat-card glass ok"><div class="stat-label">مأموريات مغلقة</div><div class="stat-value">${fmtNum(summary.closed)}</div></div>
+    <div class="stat-card glass"><div class="stat-label">إجمالي المسافات المقطوعة</div><div class="stat-value">${fmtNum(summary.totalDistance)} كم</div></div>
   `;
-  drawDoughnut('fleet-chart', ['مفتوحة','مغلقة'], [summary.open, summary.closed], ['#FFC94A','#8CFF3D']);
-
+  drawDoughnut('fleet-chart', ['مفتوحة','مغلقة'], [summary.open, summary.closed], ['#FFD166','#4CFFA0']);
   const headers = ['كود السائق','اسم السائق','رقم السيارة','التحرك من','الوصول الي','تاريخ ووقت البداية','المسافة','الحالة'];
   renderTable('fleet-table', headers, data.map(r => [
     getVal(r,'كود السائق'), getVal(r,'اسم السائق'), getVal(r,'رقم السيارة'),
@@ -636,16 +721,14 @@ function renderFleet(data, summary){
   ]));
 }
 
-/* ===== عرض الصيانة ===== */
 function renderMaintenance(data, summary){
   document.getElementById('maint-cost').innerHTML = `${fmtNum(summary.totalEstimatedCost)} <span>جنيه</span>`;
   document.getElementById('maint-stats').innerHTML = `
-    <div class="stat-card ok"><div class="stat-label">تمت الصيانة</div><div class="stat-value">${fmtNum(summary.done)}</div></div>
-    <div class="stat-card warn"><div class="stat-label">تحت الصيانة حاليًا</div><div class="stat-value">${fmtNum(summary.inProgress)}</div></div>
-    <div class="stat-card danger"><div class="stat-label">لم تتم صيانتها بعد</div><div class="stat-value">${fmtNum(summary.notDone)}</div></div>
+    <div class="stat-card glass ok"><div class="stat-label">تمت الصيانة</div><div class="stat-value">${fmtNum(summary.done)}</div></div>
+    <div class="stat-card glass warn"><div class="stat-label">تحت الصيانة حاليًا</div><div class="stat-value">${fmtNum(summary.inProgress)}</div></div>
+    <div class="stat-card glass danger"><div class="stat-label">لم تتم صيانتها بعد</div><div class="stat-value">${fmtNum(summary.notDone)}</div></div>
   `;
-  drawDoughnut('maint-chart', ['تمت','تحت الصيانة','لم تتم'], [summary.done, summary.inProgress, summary.notDone], ['#8CFF3D','#FFC94A','#FF5C5C']);
-
+  drawDoughnut('maint-chart', ['تمت','تحت الصيانة','لم تتم'], [summary.done, summary.inProgress, summary.notDone], ['#4CFFA0','#FFD166','#FF6B6B']);
   const headers = ['نوع السيارة','رقم السيارة','مشاكل خارج التأمين','حالة السيارة','السعر التقريبي'];
   renderTable('maint-table', headers, data.map(r => [
     getVal(r,'نوع السيارة'), getVal(r,'رقم السيارة'), getVal(r,'مشاكل خارج التامين'),
@@ -653,23 +736,20 @@ function renderMaintenance(data, summary){
   ]));
 }
 
-/* ===== عرض التراخيص ===== */
 function renderLicenses(data, summary){
   document.getElementById('lic-urgent').innerHTML = `${fmtNum(summary.expired + summary.expiringSoon)} <span>من ${fmtNum(summary.total)}</span>`;
   document.getElementById('lic-stats').innerHTML = `
-    <div class="stat-card danger"><div class="stat-label">رخص منتهية</div><div class="stat-value">${fmtNum(summary.expired)}</div></div>
-    <div class="stat-card warn"><div class="stat-label">تنتهي خلال 30 يوم</div><div class="stat-value">${fmtNum(summary.expiringSoon)}</div></div>
-    <div class="stat-card ok"><div class="stat-label">سارية</div><div class="stat-value">${fmtNum(summary.ok)}</div></div>
+    <div class="stat-card glass danger"><div class="stat-label">رخص منتهية</div><div class="stat-value">${fmtNum(summary.expired)}</div></div>
+    <div class="stat-card glass warn"><div class="stat-label">تنتهي خلال 30 يوم</div><div class="stat-value">${fmtNum(summary.expiringSoon)}</div></div>
+    <div class="stat-card glass ok"><div class="stat-label">سارية</div><div class="stat-value">${fmtNum(summary.ok)}</div></div>
   `;
-  drawDoughnut('lic-chart', ['منتهية','قريبة الانتهاء','سارية'], [summary.expired, summary.expiringSoon, summary.ok], ['#FF5C5C','#FFC94A','#8CFF3D']);
-
+  drawDoughnut('lic-chart', ['منتهية','قريبة الانتهاء','سارية'], [summary.expired, summary.expiringSoon, summary.ok], ['#FF6B6B','#FFD166','#4CFFA0']);
   const sorted = [...data].sort((a,b) => {
     const da = getVal(a,'الفرق'), db = getVal(b,'الفرق');
     if(typeof da !== 'number') return 1;
     if(typeof db !== 'number') return -1;
     return da - db;
   });
-
   const headers = ['رقم السيارة','نوع السيارة','تاريخ الانتهاء','الحالة'];
   renderTable('lic-table', headers, sorted.map(r => [
     getVal(r,'رقم السيارة'), getVal(r,'نوع السيارة'), fmtDate(getVal(r,'تاريخ انتهاء الرخصة')),
@@ -677,20 +757,14 @@ function renderLicenses(data, summary){
   ]));
 }
 
-/* ===== عرض المخالفات ===== */
 function renderViolations(data, summary){
   document.getElementById('viol-value').innerHTML = `${fmtNum(summary.totalViolationsValue)} <span>جنيه</span>`;
   document.getElementById('viol-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">عدد السيارات المسجل عليها مخالفات</div><div class="stat-value">${fmtNum(summary.total)}</div></div>
-    <div class="stat-card warn"><div class="stat-label">إجمالي عدد المخالفات</div><div class="stat-value">${fmtNum(summary.totalViolationsCount)}</div></div>
+    <div class="stat-card glass"><div class="stat-label">عدد السيارات المسجل عليها مخالفات</div><div class="stat-value">${fmtNum(summary.total)}</div></div>
+    <div class="stat-card glass warn"><div class="stat-label">إجمالي عدد المخالفات</div><div class="stat-value">${fmtNum(summary.totalViolationsCount)}</div></div>
   `;
-
   const top5 = [...data].sort((a,b) => (getVal(b,'قيمه الخالفات','قيمة المخالفات')||0) - (getVal(a,'قيمه الخالفات','قيمة المخالفات')||0)).slice(0,5);
-  drawBar('viol-chart',
-    top5.map(r => getVal(r,'لوحة السيارة')),
-    top5.map(r => getVal(r,'قيمه الخالفات','قيمة المخالفات') || 0)
-  );
-
+  drawBar('viol-chart', top5.map(r => getVal(r,'لوحة السيارة')), top5.map(r => getVal(r,'قيمه الخالفات','قيمة المخالفات') || 0));
   const headers = ['لوحة السيارة','الاسم','الكود الوظيفي','إجمالي المخالفات','القيمة'];
   renderTable('viol-table', headers, data.map(r => [
     getVal(r,'لوحة السيارة'), getVal(r,'الاسم'), getVal(r,'الكود الوظيفي'),
@@ -703,14 +777,14 @@ function renderTable(tableId, headers, rows){
   const table = document.getElementById(tableId);
   table.querySelector('thead').innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
   if(rows.length === 0){
-    table.querySelector('tbody').innerHTML = `<tr><td colspan="${headers.length}" style="text-align:center; color:var(--muted); padding:24px;">لا توجد بيانات بعد</td></tr>`;
+    table.querySelector('tbody').innerHTML = `<tr><td colspan="${headers.length}" style="text-align:center; color:var(--muted); padding:26px;">لا توجد بيانات بعد</td></tr>`;
     return;
   }
   table.querySelector('tbody').innerHTML = rows.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('');
 }
 
 function chartDefaults(){
-  Chart.defaults.color = '#87A491';
+  Chart.defaults.color = '#7FA793';
   Chart.defaults.font.family = "'Tajawal', sans-serif";
 }
 chartDefaults();
@@ -720,9 +794,10 @@ function drawDoughnut(canvasId, labels, values, colors){
   const ctx = document.getElementById(canvasId);
   charts[canvasId] = new Chart(ctx, {
     type:'doughnut',
-    data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderWidth:0 }] },
+    data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderWidth:0, hoverOffset:8 }] },
     options:{
       maintainAspectRatio:false,
+      animation:{ animateRotate:true, duration:900, easing:'easeOutQuart' },
       plugins:{ legend:{ position:'bottom', labels:{ padding:16, usePointStyle:true } } },
       cutout:'62%'
     }
@@ -734,14 +809,12 @@ function drawBar(canvasId, labels, values){
   const ctx = document.getElementById(canvasId);
   charts[canvasId] = new Chart(ctx, {
     type:'bar',
-    data:{ labels, datasets:[{ data:values, backgroundColor:'#8CFF3D', borderRadius:6, maxBarThickness:34 }] },
+    data:{ labels, datasets:[{ data:values, backgroundColor:'#4CFFA0', borderRadius:8, maxBarThickness:34 }] },
     options:{
       maintainAspectRatio:false,
+      animation:{ duration:800, easing:'easeOutQuart' },
       plugins:{ legend:{ display:false } },
-      scales:{
-        x:{ grid:{ display:false } },
-        y:{ grid:{ color:'#22342A' } }
-      }
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,.06)' } } }
     }
   });
 }
