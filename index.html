@@ -229,6 +229,51 @@
   .content-grid{ display:grid; grid-template-columns:340px 1fr; gap:18px; align-items:start; }
   @media (max-width:900px){ .content-grid{ grid-template-columns:1fr; } }
 
+  .charts-row{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+  @media (max-width:900px){ .charts-row{ grid-template-columns:1fr; } }
+
+  .filter-bar{
+    display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;
+    padding:16px 18px; margin-bottom:16px;
+  }
+  .filter-bar .f-field{ display:flex; flex-direction:column; gap:6px; }
+  .filter-bar label{ font-size:12px; color:var(--muted); }
+  .filter-bar input[type="date"]{
+    background:rgba(255,255,255,.04); border:1px solid var(--glass-border); color:var(--text);
+    padding:9px 12px; border-radius:10px; font-family:'Tajawal'; font-size:13px;
+    color-scheme:dark;
+  }
+  .filter-bar input[type="date"]:focus{ outline:none; border-color:var(--neon); }
+  .filter-btn{
+    background:rgba(76,255,160,.12); color:var(--neon); border:1px solid rgba(76,255,160,.3);
+    padding:9px 18px; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-size:13px; font-weight:700;
+    transition:background .2s;
+  }
+  .filter-btn:hover{ background:rgba(76,255,160,.2); }
+  .filter-btn.reset{ background:rgba(255,255,255,.05); color:var(--muted); border-color:var(--glass-border); }
+  .filter-hint{ font-size:12px; color:var(--muted); margin-right:auto; }
+
+  /* ===== تنبيه عائم (Toast) ===== */
+  #toastContainer{ position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:999; display:flex; flex-direction:column; gap:10px; align-items:center; }
+  .toast{
+    display:flex; align-items:center; gap:10px;
+    padding:13px 20px; border-radius:14px; font-size:13.5px; font-weight:600;
+    background:rgba(30,10,10,.65); backdrop-filter:blur(18px);
+    border:1px solid rgba(255,107,107,.35); color:#FFD9D9;
+    box-shadow:0 12px 30px -10px rgba(0,0,0,.6);
+    animation:toastIn .35s ease, toastOut .35s ease 3.2s forwards;
+  }
+  .toast svg{ width:18px; height:18px; flex-shrink:0; color:var(--danger); }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(-16px);} to{ opacity:1; transform:translateY(0);} }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(-10px); } }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-1px); }
+    20%,80%{ transform:translateX(2px); }
+    30%,50%,70%{ transform:translateX(-5px); }
+    40%,60%{ transform:translateX(5px); }
+  }
+  .login-card.shake{ animation:riseIn .6s cubic-bezier(.2,.9,.25,1), shake .5s ease; }
+
   .card{ padding:22px; }
   .card h4{ font-size:14px; color:var(--muted); font-weight:700; margin-bottom:15px; }
   .chart-wrap{ position:relative; height:230px; }
@@ -267,6 +312,7 @@
   <div class="blob blob3"></div>
 </div>
 <div class="grain"></div>
+<div id="toastContainer"></div>
 
 <!-- ===================== شاشة تسجيل الدخول ===================== -->
 <div id="loginScreen">
@@ -285,7 +331,6 @@
         <input type="password" id="password" autocomplete="current-password" required>
       </div>
       <button type="submit" class="btn-primary" id="loginBtn">دخول</button>
-      <div id="loginError"></div>
     </form>
   </div>
 </div>
@@ -336,15 +381,26 @@
           <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M12 2l6 6M12 2 6 8"/><circle cx="12" cy="16" r="2"/></svg>
         </div>
         <div class="stats-grid" id="fleet-stats"></div>
-        <div class="content-grid">
+        <div class="filter-bar glass">
+          <div class="f-field"><label>من تاريخ</label><input type="date" id="fleet-from"></div>
+          <div class="f-field"><label>إلى تاريخ</label><input type="date" id="fleet-to"></div>
+          <button class="filter-btn" onclick="applyFleetFilter()">تطبيق الفلتر</button>
+          <button class="filter-btn reset" onclick="resetFleetFilter()">إلغاء الفلتر</button>
+          <span class="filter-hint" id="fleet-filter-hint"></span>
+        </div>
+        <div class="charts-row">
           <div class="card glass">
             <h4>مفتوحة مقابل مغلقة</h4>
             <div class="chart-wrap"><canvas id="fleet-chart"></canvas></div>
           </div>
           <div class="card glass">
-            <h4>سجل المأموريات</h4>
-            <div class="table-scroll"><table id="fleet-table"><thead></thead><tbody></tbody></table></div>
+            <h4>عدد المأموريات يوميًا</h4>
+            <div class="chart-wrap"><canvas id="fleet-chart2"></canvas></div>
           </div>
+        </div>
+        <div class="card glass">
+          <h4>سجل المأموريات</h4>
+          <div class="table-scroll"><table id="fleet-table"><thead></thead><tbody></tbody></table></div>
         </div>
       </section>
 
@@ -358,15 +414,19 @@
           <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 1 5.4-5.4L14.7 6.3z"/></svg>
         </div>
         <div class="stats-grid" id="maint-stats"></div>
-        <div class="content-grid">
+        <div class="charts-row">
           <div class="card glass">
             <h4>حالة الأسطول</h4>
             <div class="chart-wrap"><canvas id="maint-chart"></canvas></div>
           </div>
           <div class="card glass">
-            <h4>سجل الصيانة</h4>
-            <div class="table-scroll"><table id="maint-table"><thead></thead><tbody></tbody></table></div>
+            <h4>تكلفة الصيانة حسب نوع السيارة</h4>
+            <div class="chart-wrap"><canvas id="maint-chart2"></canvas></div>
           </div>
+        </div>
+        <div class="card glass">
+          <h4>سجل الصيانة</h4>
+          <div class="table-scroll"><table id="maint-table"><thead></thead><tbody></tbody></table></div>
         </div>
       </section>
 
@@ -380,15 +440,19 @@
           <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
         </div>
         <div class="stats-grid" id="lic-stats"></div>
-        <div class="content-grid">
+        <div class="charts-row">
           <div class="card glass">
             <h4>توزيع حالة الرخص</h4>
             <div class="chart-wrap"><canvas id="lic-chart"></canvas></div>
           </div>
           <div class="card glass">
-            <h4>الرخص مرتبة حسب الأقرب انتهاءً</h4>
-            <div class="table-scroll"><table id="lic-table"><thead></thead><tbody></tbody></table></div>
+            <h4>عدد الرخص المنتهية حسب الشهر</h4>
+            <div class="chart-wrap"><canvas id="lic-chart2"></canvas></div>
           </div>
+        </div>
+        <div class="card glass">
+          <h4>الرخص مرتبة حسب الأقرب انتهاءً</h4>
+          <div class="table-scroll"><table id="lic-table"><thead></thead><tbody></tbody></table></div>
         </div>
       </section>
 
@@ -402,15 +466,19 @@
           <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3 2 20h20L12 3z"/><path d="M12 9v5M12 17h.01"/></svg>
         </div>
         <div class="stats-grid" id="viol-stats"></div>
-        <div class="content-grid">
+        <div class="charts-row">
           <div class="card glass">
             <h4>أعلى 5 حسب قيمة المخالفات</h4>
             <div class="chart-wrap"><canvas id="viol-chart"></canvas></div>
           </div>
           <div class="card glass">
-            <h4>سجل المخالفات</h4>
-            <div class="table-scroll"><table id="viol-table"><thead></thead><tbody></tbody></table></div>
+            <h4>أعلى 5 حسب عدد المخالفات</h4>
+            <div class="chart-wrap"><canvas id="viol-chart2"></canvas></div>
           </div>
+        </div>
+        <div class="card glass">
+          <h4>سجل المخالفات</h4>
+          <div class="table-scroll"><table id="viol-table"><thead></thead><tbody></tbody></table></div>
         </div>
       </section>
 
@@ -499,8 +567,6 @@ async function apiCall(action, extraParams = {}){
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('loginBtn');
-  const errBox = document.getElementById('loginError');
-  errBox.style.display = 'none';
   btn.disabled = true; btn.textContent = 'جارٍ الدخول...';
 
   const username = document.getElementById('username').value.trim();
@@ -515,8 +581,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if(!data.success){
-      errBox.textContent = data.error || 'حدث خطأ غير متوقع';
-      errBox.style.display = 'block';
+      showToast(data.error || 'اسم المستخدم أو كلمة المرور غير صحيحة');
+      shakeLoginCard();
       btn.disabled = false; btn.textContent = 'دخول';
       return;
     }
@@ -526,11 +592,27 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     startApp();
 
   }catch(err){
-    errBox.textContent = 'تعذر الاتصال بالسيرفر. تأكد من الإنترنت وحاول تاني';
-    errBox.style.display = 'block';
+    showToast('تعذر الاتصال بالسيرفر. تأكد من الإنترنت وحاول تاني');
+    shakeLoginCard();
     btn.disabled = false; btn.textContent = 'دخول';
   }
 });
+
+function showToast(message){
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 2 20h20L12 3z"/><path d="M12 9v5M12 17h.01"/></svg><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3600);
+}
+
+function shakeLoginCard(){
+  const card = document.querySelector('.login-card');
+  card.classList.remove('shake');
+  void card.offsetWidth; // إعادة تشغيل الأنيميشن
+  card.classList.add('shake');
+}
 
 document.getElementById('logoutBtn').addEventListener('click', () => {
   sessionStorage.removeItem('fleetgmc_session');
@@ -713,12 +795,59 @@ function renderFleet(data, summary){
     <div class="stat-card glass"><div class="stat-label">إجمالي المسافات المقطوعة</div><div class="stat-value">${fmtNum(summary.totalDistance)} كم</div></div>
   `;
   drawDoughnut('fleet-chart', ['مفتوحة','مغلقة'], [summary.open, summary.closed], ['#FFD166','#4CFFA0']);
+  drawFleetTrend(data);
   const headers = ['كود السائق','اسم السائق','رقم السيارة','التحرك من','الوصول الي','تاريخ ووقت البداية','المسافة','الحالة'];
   renderTable('fleet-table', headers, data.map(r => [
     getVal(r,'كود السائق'), getVal(r,'اسم السائق'), getVal(r,'رقم السيارة'),
     getVal(r,'التحرك من'), getVal(r,'الوصول الي'), fmtDate(getVal(r,'تاريخ ووقت البداية')),
     fmtNum(getVal(r,'المسافة')), statusBadge(getVal(r,'الحالة'))
   ]));
+}
+
+function drawFleetTrend(rows){
+  const byDate = {};
+  rows.forEach(r => {
+    const d = new Date(getVal(r,'تاريخ ووقت البداية'));
+    if(isNaN(d)) return;
+    const key = d.toISOString().slice(0,10);
+    byDate[key] = (byDate[key]||0) + 1;
+  });
+  const sortedKeys = Object.keys(byDate).sort();
+  const labels = sortedKeys.map(k => new Date(k).toLocaleDateString('ar-EG', { month:'short', day:'numeric' }));
+  const values = sortedKeys.map(k => byDate[k]);
+  drawLine('fleet-chart2', labels, values);
+}
+
+function computeFleetSummary(rows){
+  return {
+    total: rows.length,
+    open: rows.filter(r => getVal(r,'الحالة') === 'مفتوحة').length,
+    closed: rows.filter(r => getVal(r,'الحالة') === 'مغلقة').length,
+    totalDistance: rows.reduce((s,r) => { const v = getVal(r,'المسافة'); return s + (typeof v === 'number' ? v : 0); }, 0)
+  };
+}
+
+function applyFleetFilter(){
+  const from = document.getElementById('fleet-from').value;
+  const to = document.getElementById('fleet-to').value;
+  if(!moduleResults.FLEET) return;
+  const raw = moduleResults.FLEET.data;
+  const filtered = raw.filter(r => {
+    const d = new Date(getVal(r,'تاريخ ووقت البداية'));
+    if(isNaN(d)) return false;
+    if(from && d < new Date(from)) return false;
+    if(to && d > new Date(to + 'T23:59:59')) return false;
+    return true;
+  });
+  renderFleet(filtered, computeFleetSummary(filtered));
+  document.getElementById('fleet-filter-hint').textContent = `عدد النتائج: ${filtered.length} من ${raw.length}`;
+}
+
+function resetFleetFilter(){
+  document.getElementById('fleet-from').value = '';
+  document.getElementById('fleet-to').value = '';
+  document.getElementById('fleet-filter-hint').textContent = '';
+  if(moduleResults.FLEET) renderFleet(moduleResults.FLEET.data, moduleResults.FLEET.summary);
 }
 
 function renderMaintenance(data, summary){
@@ -729,6 +858,15 @@ function renderMaintenance(data, summary){
     <div class="stat-card glass danger"><div class="stat-label">لم تتم صيانتها بعد</div><div class="stat-value">${fmtNum(summary.notDone)}</div></div>
   `;
   drawDoughnut('maint-chart', ['تمت','تحت الصيانة','لم تتم'], [summary.done, summary.inProgress, summary.notDone], ['#4CFFA0','#FFD166','#FF6B6B']);
+
+  const byType = {};
+  data.forEach(r => {
+    const type = getVal(r,'نوع السيارة') || 'غير محدد';
+    const cost = getVal(r,'السعر التقريبي للصيانة');
+    byType[type] = (byType[type]||0) + (typeof cost === 'number' ? cost : 0);
+  });
+  drawBar('maint-chart2', Object.keys(byType), Object.values(byType), '#FFD166');
+
   const headers = ['نوع السيارة','رقم السيارة','مشاكل خارج التأمين','حالة السيارة','السعر التقريبي'];
   renderTable('maint-table', headers, data.map(r => [
     getVal(r,'نوع السيارة'), getVal(r,'رقم السيارة'), getVal(r,'مشاكل خارج التامين'),
@@ -744,6 +882,18 @@ function renderLicenses(data, summary){
     <div class="stat-card glass ok"><div class="stat-label">سارية</div><div class="stat-value">${fmtNum(summary.ok)}</div></div>
   `;
   drawDoughnut('lic-chart', ['منتهية','قريبة الانتهاء','سارية'], [summary.expired, summary.expiringSoon, summary.ok], ['#FF6B6B','#FFD166','#4CFFA0']);
+
+  const byMonth = {};
+  data.forEach(r => {
+    const d = new Date(getVal(r,'تاريخ انتهاء الرخصة'));
+    if(isNaN(d)) return;
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    byMonth[key] = (byMonth[key]||0) + 1;
+  });
+  const monthKeys = Object.keys(byMonth).sort();
+  const monthLabels = monthKeys.map(k => { const [y,m] = k.split('-'); return new Date(y, m-1, 1).toLocaleDateString('ar-EG', { month:'short', year:'2-digit' }); });
+  drawBar('lic-chart2', monthLabels, monthKeys.map(k => byMonth[k]), '#4CFFA0');
+
   const sorted = [...data].sort((a,b) => {
     const da = getVal(a,'الفرق'), db = getVal(b,'الفرق');
     if(typeof da !== 'number') return 1;
@@ -765,6 +915,10 @@ function renderViolations(data, summary){
   `;
   const top5 = [...data].sort((a,b) => (getVal(b,'قيمه الخالفات','قيمة المخالفات')||0) - (getVal(a,'قيمه الخالفات','قيمة المخالفات')||0)).slice(0,5);
   drawBar('viol-chart', top5.map(r => getVal(r,'لوحة السيارة')), top5.map(r => getVal(r,'قيمه الخالفات','قيمة المخالفات') || 0));
+
+  const top5count = [...data].sort((a,b) => (getVal(b,'اجمالي المخالفات')||0) - (getVal(a,'اجمالي المخالفات')||0)).slice(0,5);
+  drawBar('viol-chart2', top5count.map(r => getVal(r,'لوحة السيارة')), top5count.map(r => getVal(r,'اجمالي المخالفات') || 0), '#FFD166');
+
   const headers = ['لوحة السيارة','الاسم','الكود الوظيفي','إجمالي المخالفات','القيمة'];
   renderTable('viol-table', headers, data.map(r => [
     getVal(r,'لوحة السيارة'), getVal(r,'الاسم'), getVal(r,'الكود الوظيفي'),
@@ -804,17 +958,37 @@ function drawDoughnut(canvasId, labels, values, colors){
   });
 }
 
-function drawBar(canvasId, labels, values){
+function drawBar(canvasId, labels, values, color = '#4CFFA0'){
   if(charts[canvasId]) charts[canvasId].destroy();
   const ctx = document.getElementById(canvasId);
   charts[canvasId] = new Chart(ctx, {
     type:'bar',
-    data:{ labels, datasets:[{ data:values, backgroundColor:'#4CFFA0', borderRadius:8, maxBarThickness:34 }] },
+    data:{ labels, datasets:[{ data:values, backgroundColor:color, borderRadius:8, maxBarThickness:34 }] },
     options:{
       maintainAspectRatio:false,
       animation:{ duration:800, easing:'easeOutQuart' },
       plugins:{ legend:{ display:false } },
       scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,.06)' } } }
+    }
+  });
+}
+
+function drawLine(canvasId, labels, values){
+  if(charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId);
+  if(labels.length === 0){
+    charts[canvasId] = null;
+    ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height);
+    return;
+  }
+  charts[canvasId] = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[{ data:values, borderColor:'#4CFFA0', backgroundColor:'rgba(76,255,160,.15)', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:'#4CFFA0', borderWidth:2 }] },
+    options:{
+      maintainAspectRatio:false,
+      animation:{ duration:800, easing:'easeOutQuart' },
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,.06)' }, beginAtZero:true } }
     }
   });
 }
