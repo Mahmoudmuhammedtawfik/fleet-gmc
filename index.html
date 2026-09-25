@@ -1764,7 +1764,7 @@ function renderViolTableRows(rows){
       getVal(r,'لوحة السيارة'), getVal(r,'الاسم'), getVal(r,'الكود الوظيفي'),
       fmtNum(getVal(r,'اجمالي المخالفات')), fmtNum(getVal(r,'قيمه الخالفات','قيمة المخالفات'))
     ];
-    if(canEdit || canDelete) row.push(rowActionsHTML('Traffic violation', r, canEdit, canDelete));
+    if(canEdit || canDelete) row.push(rowActionsHTML('Traffic violations', r, canEdit, canDelete));
     return row;
   }));
 }
