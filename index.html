@@ -602,7 +602,7 @@
                 <button type="button" class="group-tab" data-status="لم تتم صيانتها">لم تتم صيانتها</button>
                 <button type="button" class="group-tab" data-status="تمت الصيانة">تمت الصيانة</button>
               </div>
-              <button type="button" class="add-record-btn" id="maint-add-btn" style="display:none;" onclick="openCrudModal('MAINTENANCE','add')">+ إضافة سيارة</button>
+              <button type="button" class="add-record-btn" id="maint-add-btn" style="display:none;" onclick="openCrudModal('Maintenance Services','add')">+ إضافة سيارة</button>
             </div>
           </div>
           <div class="table-scroll"><table id="maint-table"><thead></thead><tbody></tbody></table></div>
@@ -632,7 +632,7 @@
         <div class="card glass">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:15px;">
             <h4 style="margin:0;">الرخص مرتبة حسب الأقرب انتهاءً</h4>
-            <button type="button" class="add-record-btn" id="lic-add-btn" style="display:none;" onclick="openCrudModal('LICENSES','add')">+ إضافة رخصة</button>
+            <button type="button" class="add-record-btn" id="lic-add-btn" style="display:none;" onclick="openCrudModal('Licenses','add')">+ إضافة رخصة</button>
           </div>
           <div class="table-scroll"><table id="lic-table"><thead></thead><tbody></tbody></table></div>
         </div>
@@ -663,7 +663,7 @@
             <h4 style="margin:0;">سجل المخالفات</h4>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <input type="text" id="viol-search" class="search-input" placeholder="بحث بالاسم أو الكود الوظيفي أو رقم السيارة...">
-              <button type="button" class="add-record-btn" id="viol-add-btn" style="display:none;" onclick="openCrudModal('VIOLATIONS','add')">+ إضافة مخالفة</button>
+              <button type="button" class="add-record-btn" id="viol-add-btn" style="display:none;" onclick="openCrudModal('Traffic violations','add')">+ إضافة مخالفة</button>
             </div>
           </div>
           <div class="table-scroll"><table id="viol-table"><thead></thead><tbody></tbody></table></div>
@@ -989,7 +989,7 @@ function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
 
 /* ============ إعدادات الإضافة/التعديل ============ */
 const CRUD_FORMS = {
-  MAINTENANCE: {
+  'Maintenance Services': {
     fields: [
       { key:'نوع السيارة', label:'نوع السيارة', type:'text', required:true },
       { key:'رقم السيارة', label:'رقم السيارة', type:'text', required:true },
@@ -1000,20 +1000,23 @@ const CRUD_FORMS = {
       { key:'السعر التقريبي للصيانة', label:'السعر التقريبي للصيانة (جنيه)', type:'number', required:false }
     ]
   },
-  LICENSES: {
+
+  'Licenses': {
     fields: [
       { key:'رقم السيارة', label:'رقم السيارة', type:'text', required:true },
       { key:'نوع السيارة', label:'نوع السيارة', type:'text', required:true },
       { key:'تاريخ انتهاء الرخصة', label:'تاريخ انتهاء الرخصة', type:'date', required:true }
     ]
   },
-  VIOLATIONS: {
+
+  'Traffic violations': {
     fields: [
       { key:'لوحة السيارة', label:'لوحة السيارة', type:'text', required:true },
-      { key:'الاسم', label:'اسم السائق / الموظف', type:'text', required:true },
+      { key:'الاسم', label:'الاسم', type:'text', required:true },
       { key:'الكود الوظيفي', label:'الكود الوظيفي', type:'text', required:true },
-      { key:'اجمالي المخالفات', label:'إجمالي عدد المخالفات', type:'number', required:true },
-      { key:'قيمه الخالفات', label:'قيمة المخالفات (جنيه)', type:'number', required:true }
+      { key:'اجمالي المخالفات', label:'اجمالي المخالفات', type:'number', required:true },
+      { key:'قيمه الخالفات', label:'قيمه الخالفات', type:'number', required:true },
+      { key:'ملاحظـــــــات', label:'ملاحظـــــــات', type:'text', required:false }
     ]
   }
 };
@@ -1112,12 +1115,36 @@ async function deleteCrudRow(key, rowNum){
 }
 
 function applyCrudButtonsVisibility(){
-  const map = { MAINTENANCE:'maint-add-btn', LICENSES:'lic-add-btn', VIOLATIONS:'viol-add-btn' };
-  Object.entries(map).forEach(([key, btnId]) => {
-    const btn = document.getElementById(btnId);
+
+  const items = [
+    {
+      backendKey:'Maintenance Services',
+      btnId:'maint-add-btn'
+    },
+    {
+      backendKey:'Licenses',
+      btnId:'lic-add-btn'
+    },
+    {
+      backendKey:'Traffic violations',
+      btnId:'viol-add-btn'
+    }
+  ];
+
+  items.forEach(item => {
+
+    const btn = document.getElementById(item.btnId);
+
     if(!btn) return;
-    const canAdd = session.crud && session.crud[key] && session.crud[key].add;
-    btn.style.display = canAdd ? 'inline-block' : 'none';
+
+    const canAdd =
+      session.crud &&
+      session.crud[item.backendKey] &&
+      session.crud[item.backendKey].add;
+
+    btn.style.display =
+      canAdd ? 'inline-block' : 'none';
+
   });
 }
 
@@ -1633,8 +1660,8 @@ function filterMaintByStatus(rows, status){
 }
 
 function renderMaintTableRows(rows){
-  const canEdit = session.crud && session.crud.MAINTENANCE && session.crud.MAINTENANCE.edit;
-  const canDelete = session.crud && session.crud.MAINTENANCE && session.crud.MAINTENANCE.delete;
+  const canEdit = session.crud && session.crud['Maintenance Services'] && session.crud['Maintenance Services'].edit;
+  const canDelete = session.crud && session.crud['Maintenance Services'] && session.crud['Maintenance Services'].delete;
   const headers = ['نوع السيارة','رقم السيارة','مشاكل داخل التأمين','مشاكل خارج التأمين','حالة السيارة','السعر التقريبي'];
   if(canEdit || canDelete) headers.push('إجراءات');
   renderTable('maint-table', headers, rows.map(r => {
@@ -1643,7 +1670,7 @@ function renderMaintTableRows(rows){
       getVal(r,'مشاكل داخل التأمين') || '—', getVal(r,'مشاكل خارج التامين') || '—',
       statusBadge(getVal(r,'حالة السيارة')), fmtNum(getVal(r,'السعر التقريبي للصيانة'))
     ];
-    if(canEdit || canDelete) row.push(rowActionsHTML('MAINTENANCE', r, canEdit, canDelete));
+    if(canEdit || canDelete) row.push(rowActionsHTML('Maintenance Services', r, canEdit, canDelete));
     return row;
   }));
 }
@@ -1696,13 +1723,13 @@ function renderLicenses(data, summary){
     if(typeof db !== 'number') return -1;
     return da - db;
   });
-  const canEdit = session.crud && session.crud.LICENSES && session.crud.LICENSES.edit;
-  const canDelete = session.crud && session.crud.LICENSES && session.crud.LICENSES.delete;
+  const canEdit = session.crud && session.crud['Licenses'] && session.crud['Licenses'].edit;
+  const canDelete = session.crud && session.crud['Licenses'] && session.crud['Licenses'].delete;
   const headers = ['رقم السيارة','نوع السيارة','تاريخ الانتهاء','الحالة'];
   if(canEdit || canDelete) headers.push('إجراءات');
   renderTable('lic-table', headers, sorted.map(r => {
     const row = [getVal(r,'رقم السيارة'), getVal(r,'نوع السيارة'), fmtDate(getVal(r,'تاريخ انتهاء الرخصة')), daysBadge(getVal(r,'الفرق'))];
-    if(canEdit || canDelete) row.push(rowActionsHTML('LICENSES', r, canEdit, canDelete));
+    if(canEdit || canDelete) row.push(rowActionsHTML('Licenses', r, canEdit, canDelete));
     return row;
   }));
 }
@@ -1728,8 +1755,8 @@ function renderViolations(data, summary){
 }
 
 function renderViolTableRows(rows){
-  const canEdit = session.crud && session.crud.VIOLATIONS && session.crud.VIOLATIONS.edit;
-  const canDelete = session.crud && session.crud.VIOLATIONS && session.crud.VIOLATIONS.delete;
+  const canEdit = session.crud && session.crud['Traffic violations'] && session.crud['Traffic violations'].edit;
+  const canDelete = session.crud && session.crud['Traffic violations'] && session.crud['Traffic violations'].delete;
   const headers = ['لوحة السيارة','الاسم','الكود الوظيفي','إجمالي المخالفات','القيمة'];
   if(canEdit || canDelete) headers.push('إجراءات');
   renderTable('viol-table', headers, rows.map(r => {
@@ -1737,7 +1764,7 @@ function renderViolTableRows(rows){
       getVal(r,'لوحة السيارة'), getVal(r,'الاسم'), getVal(r,'الكود الوظيفي'),
       fmtNum(getVal(r,'اجمالي المخالفات')), fmtNum(getVal(r,'قيمه الخالفات','قيمة المخالفات'))
     ];
-    if(canEdit || canDelete) row.push(rowActionsHTML('VIOLATIONS', r, canEdit, canDelete));
+    if(canEdit || canDelete) row.push(rowActionsHTML('Traffic violation', r, canEdit, canDelete));
     return row;
   }));
 }
