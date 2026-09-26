@@ -602,7 +602,7 @@
                 <button type="button" class="group-tab" data-status="لم تتم صيانتها">لم تتم صيانتها</button>
                 <button type="button" class="group-tab" data-status="تمت الصيانة">تمت الصيانة</button>
               </div>
-              <button type="button" class="add-record-btn" id="maint-add-btn" style="display:none;" onclick="openCrudModal('Maintenance Services','add')">+ إضافة سيارة</button>
+              <button type="button" class="add-record-btn" id="maint-add-btn" style="display:none;" onclick="openCrudModal('MAINTENANCE','add')">+ إضافة سيارة</button>
             </div>
           </div>
           <div class="table-scroll"><table id="maint-table"><thead></thead><tbody></tbody></table></div>
@@ -632,7 +632,7 @@
         <div class="card glass">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:15px;">
             <h4 style="margin:0;">الرخص مرتبة حسب الأقرب انتهاءً</h4>
-            <button type="button" class="add-record-btn" id="lic-add-btn" style="display:none;" onclick="openCrudModal('Licenses','add')">+ إضافة رخصة</button>
+            <button type="button" class="add-record-btn" id="lic-add-btn" style="display:none;" onclick="openCrudModal('LICENSES','add')">+ إضافة رخصة</button>
           </div>
           <div class="table-scroll"><table id="lic-table"><thead></thead><tbody></tbody></table></div>
         </div>
@@ -663,7 +663,7 @@
             <h4 style="margin:0;">سجل المخالفات</h4>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <input type="text" id="viol-search" class="search-input" placeholder="بحث بالاسم أو الكود الوظيفي أو رقم السيارة...">
-              <button type="button" class="add-record-btn" id="viol-add-btn" style="display:none;" onclick="openCrudModal('Traffic violations','add')">+ إضافة مخالفة</button>
+              <button type="button" class="add-record-btn" id="viol-add-btn" style="display:none;" onclick="openCrudModal('VIOLATIONS','add')">+ إضافة مخالفة</button>
             </div>
           </div>
           <div class="table-scroll"><table id="viol-table"><thead></thead><tbody></tbody></table></div>
@@ -989,7 +989,7 @@ function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
 
 /* ============ إعدادات الإضافة/التعديل ============ */
 const CRUD_FORMS = {
-  'Maintenance Services': {
+  MAINTENANCE: {
     fields: [
       { key:'نوع السيارة', label:'نوع السيارة', type:'text', required:true },
       { key:'رقم السيارة', label:'رقم السيارة', type:'text', required:true },
@@ -1001,7 +1001,7 @@ const CRUD_FORMS = {
     ]
   },
 
-  'Licenses': {
+  LICENSES: {
     fields: [
       { key:'رقم السيارة', label:'رقم السيارة', type:'text', required:true },
       { key:'نوع السيارة', label:'نوع السيارة', type:'text', required:true },
@@ -1009,7 +1009,7 @@ const CRUD_FORMS = {
     ]
   },
 
-  'Traffic violations': {
+  VIOLATIONS: {
     fields: [
       { key:'لوحة السيارة', label:'لوحة السيارة', type:'text', required:true },
       { key:'الاسم', label:'الاسم', type:'text', required:true },
@@ -1118,15 +1118,15 @@ function applyCrudButtonsVisibility(){
 
   const items = [
     {
-      backendKey:'Maintenance Services',
+      backendKey:'MAINTENANCE',
       btnId:'maint-add-btn'
     },
     {
-      backendKey:'Licenses',
+      backendKey:'LICENSES',
       btnId:'lic-add-btn'
     },
     {
-      backendKey:'Traffic violations',
+      backendKey:'VIOLATIONS',
       btnId:'viol-add-btn'
     }
   ];
@@ -1142,8 +1142,7 @@ function applyCrudButtonsVisibility(){
       session.crud[item.backendKey] &&
       session.crud[item.backendKey].add;
 
-    btn.style.display =
-      canAdd ? 'inline-block' : 'none';
+    btn.style.display = canAdd ? 'inline-block' : 'none';
 
   });
 }
