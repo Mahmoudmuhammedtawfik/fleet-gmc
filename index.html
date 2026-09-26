@@ -1140,7 +1140,7 @@ function applyCrudButtonsVisibility(){
     const canAdd =
       session.crud &&
       session.crud[item.backendKey] &&
-      session.crud[item.backendKey].add;
+      session.crud[item.backendKey].add === true;
 
     btn.style.display = canAdd ? 'inline-block' : 'none';
 
